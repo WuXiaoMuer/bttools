@@ -1,0 +1,33 @@
+*.iml
+*.apk
+*.aab
+*.ap_
+*.aab_
+*.aar
+*.keystore
+*.jks
+local.properties
+.DS_Store
+
+# Gradle
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# IDE
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/deploymentTargetDropDown.xml
+.idea/misc.xml
+
+# Orphaned directories (not part of build)
+/XL/
+/main/
