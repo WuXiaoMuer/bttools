@@ -34,6 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bttools.app.AppSettings
 import com.bttools.app.SettingsManager
+import com.bttools.app.core.LineEnding
+import com.bttools.app.core.TextEncoding
 
 data class ThemeColor(
     val name: String,
@@ -155,6 +157,71 @@ fun SettingsScreen(
                     description = "在状态页面显示蓝牙状态",
                     checked = settings.showBluetooth,
                     onCheckedChange = { settingsManager?.saveShowBluetooth(it) }
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("终端默认设置", fontWeight = FontWeight.Bold)
+                Text(
+                    text = "新连接终端的默认收发参数",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
+                )
+
+                val enc = runCatching { TextEncoding.valueOf(settings.defaultEncoding) }.getOrDefault(TextEncoding.UTF8)
+                val le = runCatching { LineEnding.valueOf(settings.defaultLineEnding) }.getOrDefault(LineEnding.NONE)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    EnumDropdown(
+                        label = "编码",
+                        current = enc.displayName,
+                        options = TextEncoding.entries.filter { it != TextEncoding.HEX }.map { it.displayName to it },
+                        onSelect = { settingsManager?.saveEncoding(it.name) },
+                        modifier = Modifier.weight(1f)
+                    )
+                    EnumDropdown(
+                        label = "行尾",
+                        current = le.displayName,
+                        options = LineEnding.entries.map { it.displayName to it },
+                        onSelect = { settingsManager?.saveLineEnding(it.name) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                SwitchSetting(
+                    title = "默认 HEX 显示",
+                    description = "接收数据默认以十六进制显示",
+                    checked = settings.hexDisplay,
+                    onCheckedChange = { settingsManager?.saveHexDisplay(it) }
+                )
+                SwitchSetting(
+                    title = "默认 HEX 发送",
+                    description = "发送框默认按十六进制解析",
+                    checked = settings.hexSend,
+                    onCheckedChange = { settingsManager?.saveHexSend(it) }
+                )
+                SwitchSetting(
+                    title = "自动滚动",
+                    description = "终端自动滚动到最新数据",
+                    checked = settings.autoScroll,
+                    onCheckedChange = { settingsManager?.saveAutoScroll(it) }
+                )
+                SwitchSetting(
+                    title = "显示时间戳",
+                    description = "每条收发记录显示时间",
+                    checked = settings.showTimestamp,
+                    onCheckedChange = { settingsManager?.saveShowTimestamp(it) }
                 )
             }
         }

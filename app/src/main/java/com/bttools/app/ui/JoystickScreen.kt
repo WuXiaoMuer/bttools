@@ -58,28 +58,46 @@ data class JoyButtonConfig(
     var command: String
 )
 
+private fun defaultJoyCommands() = listOf(
+    JoyButtonConfig("up", "↑", "↑"),
+    JoyButtonConfig("down", "↓", "↓"),
+    JoyButtonConfig("left", "←", "←"),
+    JoyButtonConfig("right", "→", "→"),
+    JoyButtonConfig("up-left", "↖", "↖"),
+    JoyButtonConfig("up-right", "↗", "↗"),
+    JoyButtonConfig("down-left", "↙", "↙"),
+    JoyButtonConfig("down-right", "↘", "↘"),
+    JoyButtonConfig("stop", "●", "Z"),
+    JoyButtonConfig("a", "A", "A"),
+    JoyButtonConfig("b", "B", "B"),
+    JoyButtonConfig("x", "X", "X"),
+    JoyButtonConfig("y", "Y", "Y")
+)
+
+/** 解析持久化的摇杆命令；空串返回默认。 */
+private fun parseJoyCommands(serialized: String): List<JoyButtonConfig> {
+    val defaults = defaultJoyCommands()
+    if (serialized.isBlank()) return defaults
+    val map = serialized.split("||").mapNotNull {
+        val idx = it.indexOf('=')
+        if (idx <= 0) null else it.substring(0, idx) to it.substring(idx + 1)
+    }.toMap()
+    return defaults.map { it.copy(command = map[it.id] ?: it.command) }
+}
+
+private fun serializeJoyCommands(list: List<JoyButtonConfig>): String =
+    list.joinToString("||") { "${it.id}=${it.command}" }
+
 @Composable
 fun JoystickScreen(
-    connectionStatus: String,
-    connectedDeviceName: String?,
+    isConnected: Boolean,
+    remote: String?,
+    initialCommands: String,
+    onCommandsChanged: (String) -> Unit,
     onSendCommand: (String) -> Unit
 ) {
     val commands = remember {
-        mutableStateListOf(
-            JoyButtonConfig("up", "↑", "↑"),
-            JoyButtonConfig("down", "↓", "↓"),
-            JoyButtonConfig("left", "←", "←"),
-            JoyButtonConfig("right", "→", "→"),
-            JoyButtonConfig("up-left", "↖", "↖"),
-            JoyButtonConfig("up-right", "↗", "↗"),
-            JoyButtonConfig("down-left", "↙", "↙"),
-            JoyButtonConfig("down-right", "↘", "↘"),
-            JoyButtonConfig("stop", "●", "Z"),
-            JoyButtonConfig("a", "A", "A"),
-            JoyButtonConfig("b", "B", "B"),
-            JoyButtonConfig("x", "X", "X"),
-            JoyButtonConfig("y", "Y", "Y")
-        )
+        mutableStateListOf<JoyButtonConfig>().apply { addAll(parseJoyCommands(initialCommands)) }
     }
 
     val sentLog = remember { mutableStateListOf<String>() }
@@ -116,14 +134,8 @@ fun JoystickScreen(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = when {
-                connectionStatus.contains("已连接") -> "已连接到: ${connectedDeviceName ?: "未知设备"}"
-                connectionStatus.contains("正在连接") -> "正在连接..."
-                else -> "未连接"
-            },
-            color = if (connectionStatus.contains("已连接")) MaterialTheme.colorScheme.primary
-                    else if (connectionStatus.contains("正在连接")) MaterialTheme.colorScheme.tertiary
-                    else MaterialTheme.colorScheme.error,
+            text = if (isConnected) "已连接到: ${remote ?: "设备"}" else "未连接",
+            color = if (isConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.bodyMedium
         )
@@ -219,6 +231,7 @@ fun JoystickScreen(
             confirmButton = {
                 TextButton(onClick = {
                     config.command = editText
+                    onCommandsChanged(serializeJoyCommands(commands))
                     editingConfig = null
                 }) { Text("确定") }
             },

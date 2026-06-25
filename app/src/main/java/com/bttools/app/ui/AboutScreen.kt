@@ -32,14 +32,14 @@ fun AboutScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "蓝牙工具箱",
+            text = "嵌入式调试宝库",
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
 
         Text(
-            text = "Bluetooth Toolbox",
+            text = "Embedded Debug Toolbox · SPP/BLE/TCP/UDP",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.padding(top = 4.dp)
@@ -89,13 +89,15 @@ fun AboutScreen(
                     style = MaterialTheme.typography.titleMedium
                 )
                 HorizontalDivider()
-                FeatureItem("设备扫描与发现")
-                FeatureItem("蓝牙设备配对与连接")
-                FeatureItem("实时数据传输")
-                FeatureItem("消息记录与日志")
-                FeatureItem("摇杆控制器 (自定义指令)")
-                FeatureItem("可定制主题颜色")
-                FeatureItem("日期时间显示模块")
+                FeatureItem("蓝牙经典 SPP / BLE GATT 调试")
+                FeatureItem("TCP 客户端 / 服务端调试")
+                FeatureItem("UDP 单播 / 广播收发")
+                FeatureItem("HEX / 文本双模收发，多编码")
+                FeatureItem("行尾控制 (CR/LF/CRLF)")
+                FeatureItem("定时循环发送与快捷命令")
+                FeatureItem("收发计数、日志导出与分享")
+                FeatureItem("摇杆控制器 (自定义指令，持久化)")
+                FeatureItem("可定制主题颜色与深色模式")
             }
         }
 
